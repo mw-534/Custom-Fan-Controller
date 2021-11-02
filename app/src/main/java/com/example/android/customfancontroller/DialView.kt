@@ -13,6 +13,13 @@ private enum class FanSpeed(val label: Int) {
     LOW(R.string.fan_low),
     MEDIUM(R.string.fan_medium),
     HIGH(R.string.fan_high);
+
+    fun next() = when (this) {
+        OFF -> LOW
+        LOW -> MEDIUM
+        MEDIUM -> HIGH
+        HIGH -> OFF
+    }
 }
 
 private const val RADIUS_OFFSET_LABEL = 30
@@ -31,6 +38,26 @@ class DialView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
         textSize = 55.0f
         typeface = Typeface.create("", Typeface.BOLD)
+    }
+
+    init {
+        // Enables View to accept user input.
+        isClickable = true
+    }
+
+    override fun performClick(): Boolean {
+        // The call to super.performClick() must happen first,
+        // which enables accessibility events as well as calls onClickListener().
+        if (super.performClick()) return true
+
+        fanSpeed = fanSpeed.next()
+        contentDescription = resources.getString(fanSpeed.label)
+
+        // the invalidate() method invalidates the entire view, forcing a call to onDraw()
+        // to redraw the view. If something in your custom view changes for any reason,
+        // including user interaction, and the change needs to be displayed, call invalidate().
+        invalidate()
+        return true
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
